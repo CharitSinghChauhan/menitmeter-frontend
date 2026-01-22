@@ -9,10 +9,12 @@ api.interceptors.response.use(
   (res) => res,
   (error) => {
     // Learn : difference betweent the error and log
-    console.error(error.message);
+    console.error(error);
     // Learn : what it will do
     return Promise.reject(error);
   },
 );
 
 export default api;
+
+

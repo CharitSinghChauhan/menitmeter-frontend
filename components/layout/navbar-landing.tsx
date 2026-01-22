@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { Button } from "../ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "../ui/dialog";
 import SignIn from "../sign-in";
 import { authClient } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { Spinner } from "../ui/spinner";
+import { Loader } from "../retroui/Loader";
+import { Button } from "../retroui/Button";
+import { Dialog } from "../retroui/Dialog";
+import { Text } from "../retroui/Text";
 
 export default function Navbar() {
   const { data, isPending } = authClient.useSession();
@@ -14,40 +15,35 @@ export default function Navbar() {
   const router = useRouter();
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto flex h-16 items-center justify-between px-4">
+    <nav className="sticky top-0 z-10 w-full border-b">
+      <div className="container mx-auto flex h-16 items-center justify-between px-2">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-            <span className="font-bold text-lg">M</span>
+          {/* // TOOD : fix the sizing of the log */}
+          <div className="flex aspect-square size-8 items-center justify-center  bg-primary text-primary-foreground">
+            <span className="font-extrabold text-xl">M</span>
           </div>
-          <span className="text-2xl font-bold tracking-tight">Mentimeter</span>
+          <Text as={"h3"}>Mentimeter</Text>
         </Link>
 
         {/* Auth Actions */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           {isPending ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Spinner className="size-4" />
-              <span>Loading...</span>
-            </div>
+            <Loader />
           ) : data ? (
-            <Button 
-              onClick={() => router.push("/dashboard")} 
-              variant="default"
-            >
+            <Button onClick={() => router.push("/dashboard")} variant="default">
               Go to Dashboard
             </Button>
           ) : (
             <Dialog>
-              <DialogTrigger render={
-                <Button variant="outline" className="font-semibold">
-                  Log in
+              <Dialog.Trigger asChild>
+                <Button variant="default" className="font-semibold">
+                  Go to Dashboard
                 </Button>
-              } />
-              <DialogContent className="sm:max-w-md p-0 border-none bg-transparent shadow-none">
+              </Dialog.Trigger>
+              <Dialog.Content className="sm:max-w-sm">
                 <SignIn />
-              </DialogContent>
+              </Dialog.Content>
             </Dialog>
           )}
         </div>

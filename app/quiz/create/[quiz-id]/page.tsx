@@ -3,10 +3,17 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import z from "zod";
-import { useState } from "react";
 import AddSlides from "./components/add-slides";
+import { useState } from "react";
+import Slides from "./components/slides";
 import SlideEditor from "./components/slide-editor";
-import SlideSettings from "./components/slide-settings";
+import { useParams, useRouter } from "next/navigation";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft } from "@hugeicons/core-free-icons";
+import { usePostRequest } from "@/lib/api-utils";
+import getSocket from "@/lib/socket";
+import { Button } from "@/components/retroui/Button";
+import { Text } from "@/components/retroui/Text";
 
 export const formSchema = z.object({
   questions: z
@@ -21,8 +28,8 @@ export const formSchema = z.object({
             .array(
               z
                 .string()
-                .min(0) // Allow empty while typing
-                .max(100, "Option must not exceed 100 characters")
+                .min(1) // Allow empty while typing
+                .max(100, "Option must not exceed 100 characters"),
             )
             .min(2, "At least 2 options required")
             .max(6, "Maximum 6 options allowed"),
@@ -43,14 +50,16 @@ export const formSchema = z.object({
               code: "custom",
             });
           }
-        })
+        }),
     )
     .min(1, "At least 1 question required")
     .max(20, "Maximum 20 questions allowed"),
 });
 
 export default function CreateQuizIdPage() {
-  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const params = useParams();
+  const router = useRouter();
+  const quizId = params["quiz-id"] as string;
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +67,7 @@ export default function CreateQuizIdPage() {
       questions: [
         {
           question: "",
-          options: ["", "", ""],
+          options: ["", ""],
           correctAnsIndex: 0,
           timeLimit: 30,
           points: 100,
@@ -67,29 +76,136 @@ export default function CreateQuizIdPage() {
     },
   });
 
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "questions",
   });
 
+  const { execute, isPending } = usePostRequest();
+
+  const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    const { success, payload } = await execute(
+      `/quiz/add-question/${quizId}`,
+      data,
+    );
+
+    if (success) {
+      localStorage.setItem("sessionCode", payload.sessionCode);
+      const socket = getSocket();
+      socket.emit("user-join-quiz", {
+        sessionCode: payload.sessionCode,
+        nickname: "admin",
+      });
+      router.push(`/quiz/live/${payload.sessionCode}`);
+    }
+  };
+
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-white">
-      {/* Left Sidebar - Navigation */}
-      <div className="w-64 border-r border-gray-100 flex flex-col">
-        <AddSlides
-          fields={fields}
-          append={append}
-          remove={remove}
-          currentQIndex={currentQIndex}
-          setCurrentQIndex={setCurrentQIndex}
-        />
+    <form
+      onSubmit={form.handleSubmit(onSubmit)}
+      className="flex h-screen w-full flex-col overflow-hidden bg-background"
+    >
+      {/* Header / Toolbar Area */}
+      <header className="flex h-14 items-center justify-between border-b bg-background px-4">
+        <div className="flex items-center gap-4">
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => router.push("/dashboard")}
+            disabled={isPending}
+          >
+            <HugeiconsIcon icon={ArrowLeft} />
+            <Text as={"h5"}>Back</Text>
+          </Button>
+          <Text as={"p"}>Editing Quiz</Text>
+        </div>
+        <div className="flex gap-2">
+          <Button type="submit" size="sm" disabled={isPending}>
+            {isPending ? "Saving..." : "Save Quiz"}
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              const dummyQuestions = [
+                {
+                  question: "What is the capital of France?",
+                  options: ["London", "Berlin", "Paris", "Madrid"],
+                  correctAnsIndex: 0,
+                  timeLimit: 30,
+                  points: 100,
+                },
+                {
+                  question: "Which planet is known as the Red Planet?",
+                  options: ["Venus", "Mars", "Jupiter", "Saturn"],
+                  correctAnsIndex: 0,
+                  timeLimit: 20,
+                  points: 50,
+                },
+                {
+                  question: "What is 2 + 2?",
+                  options: ["3", "4", "5", "6"],
+                  correctAnsIndex: 0,
+                  timeLimit: 10,
+                  points: 50,
+                },
+                {
+                  question: "Who wrote Romeo and Juliet?",
+                  options: ["Shakespeare", "Dickens", "Hemingway", "Tolkien"],
+                  correctAnsIndex: 0,
+                  timeLimit: 30,
+                  points: 100,
+                },
+                {
+                  question: "What is the largest ocean on Earth?",
+                  options: ["Atlantic", "Indian", "Arctic", "Pacific"],
+                  correctAnsIndex: 0,
+                  timeLimit: 20,
+                  points: 75,
+                },
+              ];
+              form.setValue("questions", dummyQuestions);
+              setCurrentQIndex(0);
+            }}
+          >
+            Add Dummy Data
+          </Button>
+        </div>
+      </header>
+
+      {/* Main Workspace */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar: Slide List */}
+        <aside className="w-64 shrink-0 border-r bg-muted/10">
+          <AddSlides
+            fields={fields}
+            append={append}
+            remove={remove}
+            currentQIndex={currentQIndex}
+            setCurrentQIndex={setCurrentQIndex}
+          />
+        </aside>
+
+        {/* Center: Canvas/Preview */}
+        <main className="flex-1 overflow-hidden bg-muted/30 p-8 flex items-center justify-center">
+          <div className="aspect-video w-full max-w-4xl shadow-2xl ring-1 ring-border/50  bg-card overflow-hidden">
+            <Slides form={form} currentQIndex={currentQIndex} />
+          </div>
+        </main>
+
+        {/* Right Sidebar: Editor */}
+        <aside className="w-80 shrink-0 border-l bg-background overflow-y-auto">
+          <SlideEditor
+            form={form}
+            fields={fields}
+            currentQIndex={currentQIndex}
+          />
+        </aside>
       </div>
-
-      {/* Main Content - Editor */}
-      <SlideEditor form={form} currentIndex={currentQIndex} />
-
-      {/* Right Sidebar - Settings */}
-      <SlideSettings form={form} currentIndex={currentQIndex} />
-    </div>
+    </form>
   );
 }

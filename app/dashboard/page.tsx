@@ -1,16 +1,17 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { PresentationCard } from "@/app/dashboard/dashboard-components/presentation-card";
 import useFetchData from "@/hooks/use-fetch-data";
-import { Spinner } from "@/components/ui/spinner";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { AddSquareFreeIcons } from "@hugeicons/core-free-icons";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import { Plus } from "@hugeicons/core-free-icons";
 import { CreateQuizDialog } from "./dashboard-components/create-quiz-dialog";
-import { Toaster } from "@/components/ui/sonner";
+import { Dialog } from "@/components/retroui/Dialog";
+import { Button } from "@/components/retroui/Button";
+import { Loader } from "@/components/retroui/Loader";
+import { Text } from "@/components/retroui/Text";
+import { usePostRequest } from "@/lib/api-utils";
 
-// Learn :: async React components
+// TODO :: async React components
 interface Quiz {
   title: string;
   id: string;
@@ -21,52 +22,63 @@ interface Quiz {
 }
 
 export default function DashboardPage() {
-  const { fetchData, fetchError, fetching } =
+  const { fetchData, fetchError, fetching, refetch } =
     useFetchData<Quiz[]>(`/quiz/all-quizes`);
+
+  const { isPending, execute } = usePostRequest();
+
+  const handleDelete = async (quizId: string) => {
+    const { success } = await execute(`/quiz/delete/${quizId}`);
+    if (success) {
+      refetch();
+    }
+  };
 
   return (
     <div>
-      <Toaster position="top-center" />
       <div className="flex flex-col gap-12">
-        <h1 className="text-5xl font-normal">Welcome!</h1>
+        <Text className="text-5xl font-normal">Welcome!</Text>
         <div className="flex gap-4">
           <Dialog>
-            <DialogTrigger
-              render={
-                <Button size="lg" className={"flex gap-2"}>
-                  <span>Create Quiz </span>
-                  <HugeiconsIcon icon={AddSquareFreeIcons} />
-                </Button>
-              }
-            ></DialogTrigger>
-            <DialogContent>
+            <Dialog.Trigger asChild>
+              <Button className={"flex gap-2"}>
+                <Text as={"h6"} className="flex gap-2">
+                  Create Quiz
+                  <HugeiconsIcon icon={Plus} />
+                </Text>
+              </Button>
+            </Dialog.Trigger>
+            <Dialog.Content className="sm:max-w-md ">
               <CreateQuizDialog />
-            </DialogContent>
+            </Dialog.Content>
           </Dialog>
-          <Button size="lg" variant="outline" disabled>
+          <Button variant="ghost" disabled>
             Create Quiz with AI (Coming Soon)
           </Button>
-          <Button size="lg" variant="outline" disabled>
+          <Button variant="ghost" disabled>
             Import Presentation (Coming Soon)
           </Button>
         </div>
       </div>
-      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-12">
         {fetching ? (
-          <div className="flex items-center gap-2">
-            <Spinner /> <span>Loading</span>
+          <div className="flex items-center justify-center gap-2 h-full">
+            <Loader /> <span>Loading</span>
           </div>
         ) : fetchData ? (
-          fetchData.map((quiz) => (
+          fetchData.map((quiz, index) => (
             <PresentationCard
-              key={quiz.id}
+              key={index}
+              quizId={quiz.id}
               title={quiz.title}
               status={quiz.status}
               questionCount={quiz._count.questions}
+              // TODO : Created Time
+              onDelete={handleDelete}
             />
           ))
         ) : (
-          <p>{fetchError}</p>
+          <Text as={"p"}>{fetchError}</Text>
         )}
       </div>
     </div>

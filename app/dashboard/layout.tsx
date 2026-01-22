@@ -1,11 +1,20 @@
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import { AppSidebar } from "@/app/dashboard/dashboard-components/app-sidebar"
-import { DashboardNavbar } from "@/app/dashboard/dashboard-components/dashboard-navbar"
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/app/dashboard/dashboard-components/app-sidebar";
+import { DashboardNavbar } from "@/app/dashboard/dashboard-components/dashboard-navbar";
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
 
   return (
-    <SidebarProvider>
+    <SidebarProvider
+      style={{
+        "--sidebar-width": "16rem",
+        "--sidebar-width-mobile": "20rem",
+      } as React.CSSProperties}
+    >
       <AppSidebar />
       <SidebarInset>
         <DashboardNavbar />

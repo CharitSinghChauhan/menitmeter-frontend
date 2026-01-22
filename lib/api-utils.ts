@@ -3,38 +3,41 @@ import axios from "axios";
 import { useState } from "react";
 import { toast } from "sonner";
 
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  message: string;
-  payload: T;
-}
-
 interface RequestOptions {
   showToast?: boolean;
   successMessage?: string;
   errorMessage?: string;
 }
 
-export const postRequest = async <T = unknown>(
+export const postRequest = async (
   url: string,
-  data: unknown,
+  data?: unknown,
   options: RequestOptions = { showToast: true }
-): Promise<T | null> => {
+): Promise<{
+  success: boolean;
+  payload: any;
+  message: string;
+}> => {
   try {
-    const response = await api.post<ApiResponse<T>>(url, data);
+    console.log("data inside the postRequest", data);
+
+    const response = await api.post(url, data);
+
+    console.log(`api response :`, response);
+
     const { payload, success, message } = response.data;
 
     if (!success) {
       if (options.showToast) {
         toast.error(options.errorMessage || message || "Operation failed");
       }
-      return null;
+      return { payload, success, message };
     }
 
     if (options.showToast) {
       toast.success(options.successMessage || message || "Success!");
     }
-    return payload;
+    return { payload, success, message };
   } catch (error: unknown) {
     let message = "An unexpected error occurred. Please try again.";
 
@@ -47,22 +50,22 @@ export const postRequest = async <T = unknown>(
     }
 
     console.error(`POST request failed [${url}]:`, error);
-    return null;
+    return { payload: null, success: false, message };
   }
 };
- 
- // TODO : Learn :: generic unknown, null why ??
-export function usePostRequest<T = unknown>() {
+
+// TODO : Learn :: generic unknown, null why ??
+export function usePostRequest() {
   const [isPending, setIsPending] = useState(false);
 
   const execute = async (
     url: string,
-    data: unknown,
+    data?: unknown,
     options: RequestOptions = { showToast: true }
-  ): Promise<T | null> => {
+  ) => {
     setIsPending(true);
     try {
-      return await postRequest<T>(url, data, options);
+      return await postRequest(url, data, options);
     } finally {
       setIsPending(false);
     }

@@ -1,5 +1,6 @@
 "use client";
 
+// TODO :
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
@@ -57,14 +58,14 @@ export function DashboardNavbar() {
           <HugeiconsIcon icon={StarIcon} size={16} />
           Upgrade
         </Button>
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <Button variant="ghost" size="icon" className="">
           <HugeiconsIcon icon={Notification01Icon} size={20} />
         </Button>
         {isPending ? (
           <Spinner />
         ) : data ? (
           <DropdownMenu>
-            <DropdownMenuTrigger className="h-9 w-9 rounded-full bg-orange-100 flex items-center justify-center overflow-hidden border border-orange-200 text-orange-700 cursor-pointer outline-none transition-colors hover:bg-orange-200">
+            <DropdownMenuTrigger className="h-9 w-9 bg-orange-100 flex items-center justify-center overflow-hidden border border-orange-200 text-orange-700 cursor-pointer outline-none transition-colors hover:bg-orange-200">
               <span className="font-medium text-sm">C</span>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -78,7 +79,7 @@ export function DashboardNavbar() {
             </DropdownMenuContent>
           </DropdownMenu>
         ) : (
-          <div className="h-9 w-9 rounded-full bg-orange-100 flex items-center justify-center overflow-hidden border border-orange-200 text-orange-700 cursor-pointer">
+          <div className="h-9 w-9 bg-orange-100 flex items-center justify-center overflow-hidden border border-orange-200 text-orange-700 cursor-pointer">
             <span className="font-medium text-sm">C</span>
           </div>
         )}

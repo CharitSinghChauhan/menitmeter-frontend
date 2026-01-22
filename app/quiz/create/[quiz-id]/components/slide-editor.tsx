@@ -1,94 +1,233 @@
-"use client";
-
-import { UseFormReturn } from "react-hook-form";
-import z from "zod";
-import { formSchema } from "../page";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { ThumbsUpIcon, UserGroupIcon } from "@hugeicons/core-free-icons";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Field,
+  FieldLabel,
+  FieldDescription,
+  FieldError,
+  FieldGroup,
+} from "@/components/ui/field";
+import { FieldArrayWithId, UseFormReturn, Controller } from "react-hook-form";
+import { formSchema } from "../page";
+import z from "zod";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Delete02Icon, Tick01Icon } from "@hugeicons/core-free-icons";
+import { cn } from "@/lib/utils";
 
 interface SlideEditorProps {
   form: UseFormReturn<z.infer<typeof formSchema>>;
-  currentIndex: number;
+  fields: FieldArrayWithId<z.infer<typeof formSchema>, "questions", "id">[];
+  currentQIndex: number;
 }
 
-export default function SlideEditor({ form, currentIndex }: SlideEditorProps) {
-  const question = form.watch(`questions.${currentIndex}`);
+export default function SlideEditor({
+  form,
+  fields,
+  currentQIndex,
+}: SlideEditorProps) {
+  const currentQuestion = fields[currentQIndex];
+  const questionErrors = form.formState.errors.questions?.[currentQIndex];
 
-  if (!question) return null;
+  const addOption = () => {
+    const currentOptions = form.getValues(`questions.${currentQIndex}.options`);
+    if (currentOptions.length < 6) {
+      form.setValue(`questions.${currentQIndex}.options`, [
+        ...currentOptions,
+        "",
+      ]);
+    }
+  };
+
+  const removeOption = (optionIndex: number) => {
+    const currentOptions = form.getValues(`questions.${currentQIndex}.options`);
+    if (currentOptions.length > 2) {
+      const newOptions = currentOptions.filter((_, i) => i !== optionIndex);
+      form.setValue(`questions.${currentQIndex}.options`, newOptions);
+
+      const currentCorrect = form.getValues(
+        `questions.${currentQIndex}.correctAnsIndex`
+      );
+      if (currentCorrect === optionIndex) {
+        form.setValue(`questions.${currentQIndex}.correctAnsIndex`, 0);
+      } else if (currentCorrect > optionIndex) {
+        form.setValue(
+          `questions.${currentQIndex}.correctAnsIndex`,
+          currentCorrect - 1
+        );
+      }
+    }
+  };
+
+  if (!currentQuestion) {
+    return (
+      <div className="flex h-full w-full items-center justify-center p-6 text-center text-muted-foreground">
+        Select a slide to edit its properties
+      </div>
+    );
+  }
 
   return (
-    <div className="flex-1 bg-[#f8f9fb] p-8 flex flex-col gap-6 overflow-y-auto">
-      {/* Top Banner */}
-      <div className="flex justify-center">
-        <div className="bg-white px-6 py-2 rounded-full shadow-sm border border-gray-100 flex items-center gap-2">
-          <span className="text-gray-600 text-sm">
-            Join at <span className="font-bold">menti.com</span> | use code
-          </span>
-          <span className="font-bold text-gray-900">5160 1032</span>
-        </div>
+    <div className="flex h-full flex-col">
+      <div className="border-b p-4">
+        <h2 className="text-lg font-semibold tracking-tight">Slide Content</h2>
+        <p className="text-sm text-muted-foreground">Edit your question details</p>
       </div>
-
-      {/* Main Slide Card */}
-      <div className="flex-1 bg-white rounded-3xl shadow-xl border border-gray-100 flex flex-col p-12 relative overflow-hidden min-h-[500px]">
-        {/* Logo Placeholder */}
-        <div className="absolute top-6 right-8 flex items-center gap-2">
-          <div className="w-5 h-5 bg-blue-600 rounded-sm italic flex items-center justify-center text-white text-[10px] b">
-            M
-          </div>
-          <span className="text-sm font-semibold text-gray-800">
-            Mentimeter
-          </span>
-        </div>
-
-        {/* Question Input */}
-        <div className="mt-8">
-          <Input
-            {...form.register(`questions.${currentIndex}.question`)}
-            placeholder="Ask your question here..."
-            className="text-4xl font-semibold border-none focus-visible:ring-0 px-0 h-auto placeholder:text-gray-300 text-gray-800"
-          />
-        </div>
-
-        {/* Visualization Preview */}
-        <div className="flex-1 flex items-end justify-center gap-8 px-12 py-16">
-          {question.options.map((option, idx) => (
-            <div key={idx} className="flex-1 flex flex-col items-center gap-4">
-              <div className="w-full flex flex-col items-center justify-end h-64">
-                {/* Bar */}
-                <div
-                  className="w-full rounded-t-lg transition-all duration-500"
-                  style={{
-                    height: "4px", // Standard height when no votes
-                    backgroundColor:
-                      idx === 0 ? "#4f66f1" : idx === 1 ? "#ff7067" : "#3d4785",
-                    opacity: 0.8,
-                  }}
+      
+      <ScrollArea className="flex-1">
+        <div className="p-6 space-y-8">
+            <FieldGroup>
+                <Controller
+                control={form.control}
+                name={`questions.${currentQIndex}.question`}
+                render={({ field, fieldState }) => (
+                    <Field>
+                    <FieldLabel htmlFor={`question-${currentQIndex}`}>
+                        Your Question
+                    </FieldLabel>
+                    <Textarea 
+                        id={`question-${currentQIndex}`} 
+                        {...field} 
+                        placeholder="What would you like to ask?"
+                        className="min-h-[100px] resize-none"
+                    />
+                    <div className="flex justify-between w-full">
+                        <FieldDescription>
+                            Max 200 characters
+                        </FieldDescription>
+                        <span className="text-xs text-muted-foreground">{field.value?.length || 0}/200</span>
+                    </div>
+                    <FieldError errors={[fieldState.error]} />
+                    </Field>
+                )}
                 />
-              </div>
-              <div className="w-full pt-4 border-t-2 border-gray-100">
-                <p className="text-center font-medium text-gray-600 truncate">
-                  {option || `Option ${idx + 1}`}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {/* Bottom Bar */}
-        <div className="absolute bottom-6 right-8 flex items-center gap-4 text-gray-400">
-          <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full">
-            <HugeiconsIcon icon={ThumbsUpIcon} size={16} />
-          </div>
-          <div className="flex items-center gap-1.5 bg-gray-50 px-3 py-1.5 rounded-full">
-            <HugeiconsIcon icon={UserGroupIcon} size={16} />
-            <span className="text-xs font-bold">0</span>
-          </div>
-          <div className="bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-            0/1
-          </div>
+                <Controller
+                control={form.control}
+                name={`questions.${currentQIndex}.correctAnsIndex`}
+                render={({ field: correctField, fieldState: correctFieldState }) => (
+                    <Field>
+                    <FieldLabel>Options</FieldLabel>
+                    <div className="space-y-3">
+                        {form
+                        .watch(`questions.${currentQIndex}.options`)
+                        ?.map((_, index) => (
+                            <Controller
+                            key={index}
+                            control={form.control}
+                            name={`questions.${currentQIndex}.options.${index}`}
+                            render={({ field, fieldState }) => (
+                                <div className="space-y-1">
+                                    <div className="flex gap-2">
+                                        <div className="flex-1">
+                                            <Input 
+                                                {...field} 
+                                                placeholder={`Option ${index + 1}`}
+                                            />
+                                        </div>
+                                        <Button
+                                            type="button"
+                                            size="icon"
+                                            onClick={() => correctField.onChange(index)}
+                                            variant={
+                                            correctField.value === index
+                                                ? "default"
+                                                : "outline"
+                                            }
+                                            className={cn(
+                                                "shrink-0",
+                                                correctField.value === index && "bg-emerald-600 hover:bg-emerald-700"
+                                            )}
+                                            title="Mark as correct answer"
+                                        >
+                                            <HugeiconsIcon icon={Tick01Icon} size={18} />
+                                        </Button>
+                                        
+                                        {form.watch(`questions.${currentQIndex}.options`).length > 2 && (
+                                            <Button
+                                                type="button"
+                                                size="icon"
+                                                onClick={() => removeOption(index)}
+                                                variant="ghost"
+                                                className="shrink-0 text-muted-foreground hover:text-destructive"
+                                            >
+                                                <HugeiconsIcon icon={Delete02Icon} size={18} />
+                                            </Button>
+                                        )}
+                                    </div>
+                                    <FieldError errors={[fieldState.error]} />
+                                </div>
+                            )}
+                            />
+                        ))}
+                    </div>
+                    
+                    <Button
+                        type="button"
+                        onClick={addOption}
+                        variant="secondary"
+                        className="w-full mt-2"
+                        disabled={
+                        form.watch(`questions.${currentQIndex}.options`).length >= 6
+                        }
+                    >
+                        + Add Option
+                    </Button>
+                    <FieldError errors={[questionErrors?.options]} />
+                    <FieldError errors={[correctFieldState.error]} />
+                    </Field>
+                )}
+                />
+            </FieldGroup>
+
+            <div className="space-y-4 pt-4 border-t">
+                <h3 className="text-sm font-medium text-foreground">Settings</h3>
+                <div className="grid grid-cols-2 gap-4">
+                    <Controller
+                    control={form.control}
+                    name={`questions.${currentQIndex}.timeLimit`}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                        <FieldLabel htmlFor={`timeLimit-${currentQIndex}`} className="text-xs">
+                            Time (sec)
+                        </FieldLabel>
+                        <Input
+                            id={`timeLimit-${currentQIndex}`}
+                            type="number"
+                            min={5}
+                            max={300}
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                        <FieldError errors={[fieldState.error]} />
+                        </Field>
+                    )}
+                    />
+
+                    <Controller
+                    control={form.control}
+                    name={`questions.${currentQIndex}.points`}
+                    render={({ field, fieldState }) => (
+                        <Field>
+                        <FieldLabel htmlFor={`points-${currentQIndex}`} className="text-xs">
+                            Points
+                        </FieldLabel>
+                        <Input
+                            id={`points-${currentQIndex}`}
+                            type="number"
+                            min={1}
+                            {...field}
+                            onChange={(e) => field.onChange(Number(e.target.value))}
+                        />
+                        <FieldError errors={[fieldState.error]} />
+                        </Field>
+                    )}
+                    />
+                </div>
+            </div>
         </div>
-      </div>
+      </ScrollArea>
     </div>
   );
 }

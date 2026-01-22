@@ -1,61 +1,57 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { cn } from "@/utils/utils";
-import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 import { signIn } from "@/lib/auth";
+import { Card } from "./retroui/Card";
+import { Button } from "./retroui/Button";
+import { Text } from "./retroui/Text";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { GoogleIcon } from "@hugeicons/core-free-icons";
+import { Dialog } from "./retroui/Dialog";
 
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
   return (
-    <Card className="max-w-md ">
-      <CardHeader>
-        <CardTitle className="text-lg md:text-xl font-bold text-center">Sign In</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid gap-4 ">
-          <div
-            className={cn(
-              "w-full gap-2 flex items-center",
-              "justify-between flex-col"
-            )}
+    <Card>
+      <Dialog.Header className="flex justify-center items-center py-4 bg-accent text-accent-foreground border-0 ">
+        <Text as={"h4"} className="text-center">
+          Sign In
+        </Text>
+      </Dialog.Header>
+      <Card.Content>
+        <Button
+          variant="secondary"
+          className={cn("w-full gap-2 flex justify-center items-center")}
+          disabled={loading}
+          onClick={async () => {
+            await signIn.social(
+              {
+                provider: "google",
+                callbackURL: "http://localhost:3000/dashboard",
+              },
+              // TODO : Learn
+              {
+                onRequest: (ctx) => {
+                  setLoading(true);
+                },
+                onResponse: (ctx) => {
+                  setLoading(false);
+                },
+              },
+            );
+          }}
+        >
+          <Text
+            as={"h5"}
+            className="text-center flex justify-center items-center gap-4"
           >
-            <Button
-              variant="default"
-              className={cn("w-full gap-2")}
-              disabled={loading}
-              onClick={async () => {
-                await signIn.social(
-                  {
-                    provider: "google",
-                    callbackURL: "/dashboard",
-                  },
-                  {
-                    onRequest: (ctx) => {
-                      setLoading(true);
-                    },
-                    onResponse: (ctx) => {
-                      setLoading(false);
-                    },
-                  }
-                );
-              }}
-            >
-              <HugeiconsIcon icon={GoogleIcon}  />
-              Sign in with Google
-            </Button>
-          </div>
-        </div>
-      </CardContent>
+            <HugeiconsIcon icon={GoogleIcon} />
+            Google
+          </Text>
+        </Button>
+      </Card.Content>
     </Card>
   );
 }

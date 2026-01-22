@@ -1,14 +1,12 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Button } from "@/components/retroui/Button";
+import { Card } from "@/components/retroui/Card";
+import { Dialog } from "@/components/retroui/Dialog";
+import { Input } from "@/components/retroui/Input";
+import { Loader } from "@/components/retroui/Loader";
+import { Text } from "@/components/retroui/Text";
 import { Field, FieldError, FieldGroup } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { Spinner } from "@/components/ui/spinner";
 import { usePostRequest } from "@/lib/api-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -30,28 +28,34 @@ export function CreateQuizDialog() {
     },
   });
 
-  const { execute, isPending } = usePostRequest<{ id: string }>();
+  const { execute, isPending } = usePostRequest();
   const router = useRouter();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const payload = await execute("/quiz/create-quiz", values, {
+    const { payload, success } = await execute("/quiz/create-quiz", values, {
       successMessage: "Quiz created successfully!",
     });
 
-    if (payload?.id) {
-      router.push(`/quiz/create/${payload.id}`);
+    if (success && payload) {
+      // TODO : remove from the localStorage
+      localStorage.setItem("quiz-id", payload?.id);
+      router.push(`/quiz/create/${payload?.id}`);
     }
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <DialogHeader>
-        <DialogTitle>
+    <Card className="space-y-2 ">
+      <Dialog.Header className="flex justify-center items-center py-4 bg-accent text-accent-foreground border-0 h-16 mb-8">
+        <Text as={"h4"}>
           Create Title <span className="text-sm">(Unique)</span>
-        </DialogTitle>
-      </DialogHeader>
-      <div className="w-full">
-        <form id="create-quiz-form" onSubmit={form.handleSubmit(onSubmit)}>
+        </Text>
+      </Dialog.Header>
+      <div className="w-full px-2">
+        <form
+          id="create-quiz-form"
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="flex-1"
+        >
           <FieldGroup>
             <Controller
               name="title"
@@ -74,23 +78,18 @@ export function CreateQuizDialog() {
           </FieldGroup>
         </form>
       </div>
-      <DialogFooter className="sm:justify-start">
-        <Button
-          type="submit"
-          form="create-quiz-form"
-          disabled={isPending}
-          className="min-w-[100px]"
-        >
+      <Dialog.Footer className="sm:justify-start w-full px-2 mt-4 border-0">
+        <Button type="submit" form="create-quiz-form" disabled={isPending} className="w-full flex justify-center items-center">
           {isPending ? (
             <div className="flex items-center gap-2">
-              <Spinner className="h-4 w-4" />
+              <Loader />
               <span>Creating...</span>
             </div>
           ) : (
             "Submit"
           )}
         </Button>
-      </DialogFooter>
-    </div>
+      </Dialog.Footer>
+    </Card>
   );
 }

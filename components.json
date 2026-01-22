@@ -19,5 +19,9 @@
     "ui": "@/components/ui",
     "lib": "@/lib",
     "hooks": "@/hooks"
+  },
+  "registries": {
+    "@animate-ui": "https://animate-ui.com/r/{name}.json",
+    "@retroui": "https://retroui.dev/r/{name}.json"
   }
 }
