@@ -16,6 +16,8 @@ interface ICurrenQ {
   points: number | undefined;
 }
 
+type RankingItem = [string, number];
+
 const StartQuizPage = () => {
   const [currentQ, setCurrentQ] = useState<ICurrenQ | null>({
     id: "1",
@@ -24,7 +26,7 @@ const StartQuizPage = () => {
     timeLimit: 10,
     points: 100,
   });
-  const [ranking, setRanking] = useState<any[] | null>(null);
+  const [ranking, setRanking] = useState<RankingItem[] | null>(null);
   // TODO : revamp the logic correct ans
   const [isCurrentAns, setIsCurrentAns] = useState<boolean | null>(null);
   const [correctOption, setCorrectOption] = useState<number | null>(null);
@@ -41,7 +43,7 @@ const StartQuizPage = () => {
       setSelectOption(null);
       console.log("question", response);
       if (response.success) {
-        setCurrentQ(response.payload);
+        setCurrentQ(response.payload as ICurrenQ);
       } else {
         toast.error(response.message);
       }
@@ -52,7 +54,7 @@ const StartQuizPage = () => {
       console.log("ranking", response);
       if (response.success) {
         console.log("ranking", response.payload);
-        setRanking(response.payload.top10UsersWithScore);
+        setRanking((response.payload as { top10UsersWithScore: RankingItem[] }).top10UsersWithScore);
       }
     };
 
@@ -92,13 +94,14 @@ const StartQuizPage = () => {
         console.log("answer submit", response);
         if (response.success) {
           // Update state based on response
-          if (response.payload.correctOptionIndex === index) {
+          const payload = response.payload as { correctOptionIndex: number };
+          if (payload.correctOptionIndex === index) {
             console.log("inside the correctAns");
             setIsCurrentAns(true);
           } else {
             setIsCurrentAns(false);
           }
-          setCorrectOption(response.payload.correctOptionIndex);
+          setCorrectOption(payload.correctOptionIndex);
         } else {
           setIsCurrentAns(null);
           toast.error(response.message);
@@ -193,7 +196,7 @@ const StartQuizPage = () => {
               index="name"
               categories={["score"]}
               alignment="horizontal"
-              className="h-[500px]"
+              className="h-125"
               fillColors={[
                 "#3b82f6", // blue
                 "#ef4444", // red

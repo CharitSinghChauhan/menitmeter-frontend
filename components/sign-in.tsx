@@ -13,6 +13,8 @@ import { Dialog } from "./retroui/Dialog";
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
+  const callBackUrl = window.location.origin + "dashboard";
+
   return (
     <Card>
       <Dialog.Header className="flex justify-center items-center py-4 bg-accent text-accent-foreground border-0 ">
@@ -29,7 +31,7 @@ export default function SignIn() {
             await signIn.social(
               {
                 provider: "google",
-                callbackURL: "http://localhost:3000/dashboard",
+                callbackURL: callBackUrl,
               },
               // TODO : Learn
               {
