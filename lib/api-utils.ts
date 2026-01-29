@@ -21,11 +21,9 @@ export const postRequest = async (
   try {
     console.log("data inside the postRequest", data);
 
-    const response = await api.post(url, data);
-
-    console.log(`api response :`, response);
-
-    const { payload, success, message } = response.data;
+    const response = (await api.post(url, data)).data;
+    
+    const { payload, success, message } = response;
 
     if (!success) {
       if (options.showToast) {

@@ -48,7 +48,7 @@ export default function DashboardPage() {
                 </Text>
               </Button>
             </Dialog.Trigger>
-            <Dialog.Content className="sm:max-w-md ">
+            <Dialog.Content className="sm:max-w-md">
               <CreateQuizDialog />
             </Dialog.Content>
           </Dialog>

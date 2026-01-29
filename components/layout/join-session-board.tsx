@@ -7,10 +7,10 @@ import z from "zod";
 import getSocket, { ISocketResponse } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/retroui/Button";
-import { Input } from "@/components/retroui/Input";
 import { Field, FieldError } from "@/components/ui/field";
 import { Text } from "../retroui/Text";
+import { Input } from "../retroui/Input";
+import { Button } from "../retroui/Button";
 
 const formSchema = z.object({
   sessionCode: z
@@ -63,9 +63,9 @@ export default function JoinSessionBoard() {
   }
 
   return (
-    <div className="flex w-full justify-center p-4 fixed ">
+    <div className="flex w-full justify-center p-4 ">
       <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-3xl">
-        <div className="flex w-full flex-col gap-4 border-2 border-black bg-card p-4 md:flex-row md:items-start">
+        <div className="flex w-full flex-col gap-4 border-2 border-border bg-card p-4 md:flex-row md:items-start">
           <Controller
             name="sessionCode"
             control={form.control}

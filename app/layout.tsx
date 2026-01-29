@@ -28,10 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" >
-      <body
-        className={`${space.variable} ${archivoBlack.variable} `}
-      >
+    <html lang="en">
+      <body className={`${space.variable} ${archivoBlack.variable} `}>
         <Toaster position="top-left" />
         {children}
       </body>

@@ -4,14 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import z from "zod";
 import AddSlides from "./components/add-slides";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Slides from "./components/slides";
 import SlideEditor from "./components/slide-editor";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowLeft } from "@hugeicons/core-free-icons";
 import { usePostRequest } from "@/lib/api-utils";
-import getSocket from "@/lib/socket";
 import { Button } from "@/components/retroui/Button";
 import { Text } from "@/components/retroui/Text";
 
@@ -60,6 +59,7 @@ export default function CreateQuizIdPage() {
   const params = useParams();
   const router = useRouter();
   const quizId = params["quiz-id"] as string;
+  const searchParams = useSearchParams();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,24 +83,32 @@ export default function CreateQuizIdPage() {
     name: "questions",
   });
 
+  // TODO : isPending is true when one api is called
   const { execute, isPending } = usePostRequest();
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
-    const { success, payload } = await execute(
-      `/quiz/add-question/${quizId}`,
-      data,
-    );
-
-    if (success) {
-      localStorage.setItem("sessionCode", payload.sessionCode);
-      const socket = getSocket();
-      socket.emit("user-join-quiz", {
-        sessionCode: payload.sessionCode,
-        nickname: "admin",
-      });
-      router.push(`/quiz/live/${payload.sessionCode}`);
-    }
+    await execute(`/quiz/add-question/${quizId}`, data);
+    router.replace("/dashboard");
   };
+
+  useEffect(() => {
+    (async () => {
+      if (searchParams.get("status") === "CREATED") {
+        const { payload, success } = await execute("/quiz/get-questions", {
+          quizId,
+        });
+
+        console.log("success", success);
+
+        if (success) {
+          form.setValue("questions", payload.questions);
+        } else {
+          router.push("/dashboard");
+        }
+      }
+    })();
+
+  }, []);
 
   return (
     <form

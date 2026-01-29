@@ -28,18 +28,15 @@ export function PresentationCard({
 }: PresentationCardProps) {
   const router = useRouter();
 
-  const { isPending, execute } = usePostRequest();
+  const { execute } = usePostRequest();
 
   const handleNavigateQuiz = async () => {
-    if (status === "CREATED") router.push(`/quiz/create/${quizId}`);
-    else if (status === "LIVE") {
-      const sessionCode = localStorage.getItem("sessionCode");
+    if (status === "CREATED") {
+      router.push(`/quiz/create/${quizId}?status=CREATED`);
+    } else if (status === "LIVE") {
+      const sessionCode = localStorage.getItem("session-code");
       if (sessionCode) router.push(`/quiz/live/${sessionCode}`);
       else {
-        // toast.error("Session Code is missing , Checking again");
-
-        // redirect to backend router for the sessionCode
-
         const { payload, success } = await execute(
           `/quiz/session-code`,
           {
@@ -51,7 +48,7 @@ export function PresentationCard({
         );
 
         if (success && payload.sessionCode) {
-          localStorage.setItem("sessionCode", payload.sessionCode);
+          localStorage.setItem("session-code", payload.sessionCode);
           router.push(`/quiz/live/${payload.sessionCode}`);
         } else {
           console.log("handle navigate quiz", success, payload);
@@ -59,6 +56,17 @@ export function PresentationCard({
           // For now, let's just stay or error.
         }
       }
+    }
+  };
+
+  const handleMakeQuizLive = async () => {
+    const { payload, success } = await execute(
+      `/quiz/make-quiz-live/${quizId}`,
+    );
+
+    if (success) {
+      localStorage.setItem("session-code", payload.sessionCode);
+      router.push(`/quiz/live/${payload.sessionCode}`);
     }
   };
 
@@ -71,12 +79,10 @@ export function PresentationCard({
     : "Just now";
 
   const statusDisplay = () => {
-    // TODO : status and add the action
-    // LIVE : WAITING , STARTED : live ,
-    if (status === "LIVE") return "PRESENT";
-    else if (status === "CREATED") return "EDIT";
-    else if (status === "OVER") return "RESULT";
+    if (status === "CREATED") return "EDIT";
+    else if (status === "LIVE") return "PRESENT";
     else if (status === "STARTED") return "JOIN";
+    else if (status === "OVER") return "RESULT";
   };
 
   return (
@@ -115,19 +121,20 @@ export function PresentationCard({
 
       {/* Footer / Actions */}
       <div className="flex items-center justify-between border-t-2 border-border bg-muted/20 px-4 py-3">
-        <Button
-          size="sm"
-          variant={"secondary"}
-          onClick={(e) => {
-            // Let the card click handle navigation, or explicitly here?
-            // Card has onClick, so this button is redundant if it does same thing.
-            // Maybe "Edit" text for clarity?
-            e.stopPropagation();
-            handleNavigateQuiz();
-          }}
-        >
-          {statusDisplay()}
-        </Button>
+        <div className="flex justify-center items-center gap-2">
+          <Button size="sm" variant={"default"} onClick={handleNavigateQuiz}>
+            {statusDisplay()}
+          </Button>
+          {status === "CREATED" && (
+            <Button
+              size={"sm"}
+              variant={"secondary"}
+              onClick={handleMakeQuizLive}
+            >
+              LIVE
+            </Button>
+          )}
+        </div>
         <Button
           variant="ghost"
           size="icon"

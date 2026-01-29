@@ -44,7 +44,7 @@ export function CreateQuizDialog() {
   };
 
   return (
-    <Card className="space-y-2 ">
+    <Card>
       <Dialog.Header className="flex justify-center items-center py-4 bg-accent text-accent-foreground border-0 h-16 mb-8">
         <Text as={"h4"}>
           Create Title <span className="text-sm">(Unique)</span>

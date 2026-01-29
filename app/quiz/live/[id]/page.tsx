@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import getSocket, { ISocketResponse } from "@/lib/socket";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -8,7 +7,8 @@ import { motion } from "motion/react";
 import { CopyButton } from "@/components/animate-ui/components/buttons/copy";
 import api from "@/lib/axios";
 import { usePostRequest } from "@/lib/api-utils";
-import { toast } from "sonner";
+import { Text } from "@/components/retroui/Text";
+import { Button } from "@/components/retroui/Button";
 
 export default function LivePage() {
   const router = useRouter();
@@ -82,21 +82,28 @@ export default function LivePage() {
     <div className="w-screen h-screen overflow-hidden bg-background">
       <nav className="flex justify-between items-center h-14 px-8 border-b-4 border-border fixed inset-0 z-50 bg-background">
         <div>
-          <h1 className="text-2xl text-red-500 font-semibold">Live</h1>
+          <Text as={"h2"} className="text-red-600 font-bold">
+            LIVE
+          </Text>
         </div>
         <div className="flex justify-center items-center gap-2">
-          <Button variant={`outline`}>{`SessionCode: ${sessionCode}`}</Button>
+          <Button
+            variant={`ghost`}
+            className="border-border border-2"
+          >{`SessionCode: ${sessionCode}`}</Button>
           <CopyButton content={sessionCode as string} className="" />
         </div>
         <div>
           {owner && (
-            <Button onClick={() => handleStartQuiz()}>Start the Quiz</Button>
+            <Button variant={"default"} onClick={() => handleStartQuiz()}>
+              Start the Quiz
+            </Button>
           )}
         </div>
       </nav>
       <div className="relative flex justify-center items-center h-full w-full">
         {/* Central Ball */}
-        <div className="z-20 flex items-center justify-center  border-4 border-black bg-white aspect-square w-48 text-xl font-bold shadow-2xl">
+        <div className="z-20 shadow-2xl flex items-center justify-center border-4 border-black bg-white aspect-square text-xl font-bold p-2 rounded-full">
           Quiz name
         </div>
 
@@ -132,7 +139,7 @@ export default function LivePage() {
                 right: 500,
                 bottom: 500,
               }}
-              className="absolute z-10 flex h-16 w-16 cursor-grab flex-col items-center justify-center  border-2 border-white bg-primary text-primary-foreground shadow-lg active:cursor-grabbing"
+              className="absolute z-10 flex h-16 w-16 flex-col items-center justify-center rounded-full border-2 border-white bg-primary text-primary-foreground shadow-lg "
             >
               <span className="text-xs font-bold truncate max-w-[90%] px-1">
                 {user}
