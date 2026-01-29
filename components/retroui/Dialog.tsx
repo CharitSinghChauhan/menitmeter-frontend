@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { cva, VariantProps } from "class-variance-authority";
 import React, { HTMLAttributes, ReactNode } from "react";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { X } from "lucide-react";
 
 const Dialog = ReactDialog.Root;
 const DialogTrigger = ReactDialog.Trigger;
@@ -13,9 +12,9 @@ const DialogTrigger = ReactDialog.Trigger;
 const overlayVariants = cva(
   ` fixed bg-black/80 font-head
     data-[state=open]:fade-in-0
-    data-[state=open]:animate-in 
-    data-[state=closed]:animate-out 
-    data-[state=closed]:fade-out-0 
+    data-[state=open]:animate-in
+    data-[state=closed]:animate-out
+    data-[state=closed]:fade-out-0
   `,
   {
     variants: {
@@ -31,7 +30,8 @@ const overlayVariants = cva(
 );
 
 interface IDialogBackgroupProps
-  extends HTMLAttributes<HTMLDivElement>,
+  extends
+    HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof overlayVariants> {}
 
 const DialogBackdrop = React.forwardRef<HTMLDivElement, IDialogBackgroupProps>(
@@ -50,12 +50,12 @@ const DialogBackdrop = React.forwardRef<HTMLDivElement, IDialogBackgroupProps>(
 DialogBackdrop.displayName = "DialogBackdrop";
 
 const dialogVariants = cva(
-  `fixed left-[50%] top-[50%] z-50 grid rounded overflow-hidden w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border-2 bg-background shadow-lg duration-200 
-  data-[state=open]:animate-in 
-  data-[state=open]:fade-in-0 
-  data-[state=open]:zoom-in-95 
-  data-[state=closed]:animate-out 
-  data-[state=closed]:fade-out-0 
+  `fixed left-[50%] top-[50%] z-50 grid rounded overflow-hidden w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border-2 bg-background shadow-lg duration-200
+  data-[state=open]:animate-in
+  data-[state=open]:fade-in-0
+  data-[state=open]:zoom-in-95
+  data-[state=closed]:animate-out
+  data-[state=closed]:fade-out-0
   data-[state=closed]:zoom-out-95`,
   {
     variants: {
@@ -78,8 +78,7 @@ const dialogVariants = cva(
 );
 
 interface IDialogContentProps
-  extends HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof dialogVariants> {
+  extends HTMLAttributes<HTMLDivElement>, VariantProps<typeof dialogVariants> {
   overlay?: IDialogBackgroupProps;
 }
 
@@ -112,7 +111,7 @@ const DialogContent = React.forwardRef<HTMLDivElement, IDialogContentProps>(
 );
 DialogContent.displayName = "DialogContent";
 
-interface IDialogDescriptionProps extends HTMLAttributes<HTMLDivElement> {}
+type IDialogDescriptionProps = HTMLAttributes<HTMLDivElement>;
 const DialogDescription = ({
   children,
   className,
@@ -144,7 +143,8 @@ const dialogFooterVariants = cva(
 );
 
 export interface IDialogFooterProps
-  extends HTMLAttributes<HTMLDivElement>,
+  extends
+    HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof dialogFooterVariants> {}
 
 const DialogFooter = ({
@@ -184,16 +184,12 @@ const dialogHeaderVariants = cva(
 );
 
 const DialogHeaderDefaultLayout = ({ children }: { children: ReactNode }) => {
-  return (
-    <>
-      {children}
-      <DialogTrigger title="Close pop-up" className="cursor-pointer" render={<X />}></DialogTrigger>
-    </>
-  );
+  return <>{children}</>;
 };
 
 interface IDialogHeaderProps
-  extends HTMLAttributes<HTMLDivElement>,
+  extends
+    HTMLAttributes<HTMLDivElement>,
     VariantProps<typeof dialogHeaderVariants>,
     ReactDialog.DialogTitleProps {}
 

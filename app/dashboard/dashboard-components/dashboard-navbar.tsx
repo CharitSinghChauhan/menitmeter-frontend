@@ -1,9 +1,6 @@
 "use client";
 
 // TODO :
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   SearchIcon,
@@ -12,14 +9,17 @@ import {
   User,
 } from "@hugeicons/core-free-icons";
 import { authClient, signOut } from "@/lib/auth";
+import { useRouter } from "next/navigation";
+import { Loader } from "@/components/retroui/Loader";
+import { Avatar } from "@/components/retroui/Avatar";
+import { Input } from "@/components/retroui/Input";
+import { Button } from "@/components/retroui/Button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
-import { Loader } from "@/components/retroui/Loader";
-import { Avatar } from "@/components/retroui/Avatar";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function DashboardNavbar() {
   const { data, isPending } = authClient.useSession();

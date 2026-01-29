@@ -20,7 +20,7 @@ export default function Slides({ form, currentQIndex }: slidesProps) {
       {/* Question Title */}
       <div className="w-full text-center">
         <h1 className={cn(
-            "text-3xl font-bold break-words",
+            "text-3xl font-bold wrap-break-word",
             !currentQ.question && "text-muted-foreground/40 italic"
         )}>
           {currentQ.question || "Your question here..."}
@@ -34,7 +34,7 @@ export default function Slides({ form, currentQIndex }: slidesProps) {
             <div
                 key={index}
                 className={cn(
-                    "flex items-center justify-center p-6  text-lg font-medium shadow-sm transition-all min-h-[80px]",
+                    "flex items-center justify-center p-6  text-lg font-medium shadow-sm transition-all min-h-20",
                      // Cycle through chart colors or use a standard card style
                     "bg-secondary/50 border-2 border-transparent",
                     !option && "text-muted-foreground/40 italic"

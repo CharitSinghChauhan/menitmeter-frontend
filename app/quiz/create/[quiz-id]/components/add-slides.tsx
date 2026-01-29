@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import {
   FieldArrayWithId,
   UseFieldArrayAppend,
@@ -14,6 +13,7 @@ import { CancelSquareIcon, Add01Icon } from "@hugeicons/core-free-icons";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { useHotkeys } from "react-hotkeys-hook";
+import { Button } from "@/components/retroui/Button";
 
 interface addSlidesProps {
   fields: FieldArrayWithId<z.infer<typeof formSchema>, "questions", "id">[];

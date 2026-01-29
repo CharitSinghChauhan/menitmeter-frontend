@@ -12,12 +12,10 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Sidebar,
   SidebarContent,
-  SidebarFooter,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarRail,
   SidebarGroup,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
