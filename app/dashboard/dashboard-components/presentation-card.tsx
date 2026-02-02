@@ -37,7 +37,9 @@ export function PresentationCard({
       const sessionCode = localStorage.getItem("session-code");
       if (sessionCode) router.push(`/quiz/live/${sessionCode}`);
       else {
-        const { payload, success } = await execute(
+        const { payload, success } = await execute<{
+          sessionCode: string;
+        }>(
           `/quiz/session-code`,
           {
             quizId,
@@ -47,7 +49,7 @@ export function PresentationCard({
           },
         );
 
-        if (success && payload.sessionCode) {
+        if (success && payload?.sessionCode) {
           localStorage.setItem("session-code", payload.sessionCode);
           router.push(`/quiz/live/${payload.sessionCode}`);
         } else {
@@ -60,11 +62,11 @@ export function PresentationCard({
   };
 
   const handleMakeQuizLive = async () => {
-    const { payload, success } = await execute(
-      `/quiz/make-quiz-live/${quizId}`,
-    );
+    const { payload, success } = await execute<{
+      sessionCode: string;
+    }>(`/quiz/make-quiz-live/${quizId}`);
 
-    if (success) {
+    if (success && payload?.sessionCode) {
       localStorage.setItem("session-code", payload.sessionCode);
       router.push(`/quiz/live/${payload.sessionCode}`);
     }

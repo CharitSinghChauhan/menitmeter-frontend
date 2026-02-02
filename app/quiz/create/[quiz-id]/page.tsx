@@ -94,20 +94,36 @@ export default function CreateQuizIdPage() {
   useEffect(() => {
     (async () => {
       if (searchParams.get("status") === "CREATED") {
-        const { payload, success } = await execute("/quiz/get-questions", {
+        const { payload, success } = await execute<{
+          questions: {
+            id: string;
+            createdAt: Date;
+            type: string;
+            quizId: string;
+            question: string;
+            options: string[];
+            correctOptionIndex: number;
+            timeLimit: number;
+            points: number;
+          }[];
+        } | null>("/quiz/get-questions", {
           quizId,
         });
 
-        console.log("success", success);
-
-        if (success) {
-          form.setValue("questions", payload.questions);
+        if (success && payload) {
+          const mappedQuestions = payload.questions.map((q) => ({
+            question: q.question,
+            options: q.options,
+            correctAnsIndex: q.correctOptionIndex,
+            timeLimit: q.timeLimit,
+            points: q.points,
+          }));
+          form.setValue("questions", mappedQuestions);
         } else {
           router.push("/dashboard");
         }
       }
     })();
-
   }, []);
 
   return (

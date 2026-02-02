@@ -13,7 +13,7 @@ import { Dialog } from "./retroui/Dialog";
 export default function SignIn() {
   const [loading, setLoading] = useState(false);
 
-  const callBackUrl = window.location.origin + "dashboard";
+  const callBackUrl = window.location.origin + "/dashboard";
 
   return (
     <Card>

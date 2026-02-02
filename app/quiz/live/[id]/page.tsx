@@ -1,6 +1,5 @@
 "use client";
 
-import getSocket, { ISocketResponse } from "@/lib/socket";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { motion } from "motion/react";
@@ -9,6 +8,7 @@ import api from "@/lib/axios";
 import { usePostRequest } from "@/lib/api-utils";
 import { Text } from "@/components/retroui/Text";
 import { Button } from "@/components/retroui/Button";
+import { ISocketResponse, useSocket } from "@/providers/socket-provider";
 
 export default function LivePage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function LivePage() {
   const sessionCode = params["id"];
   const [owner, setOwner] = useState(false);
   const { execute, isPending } = usePostRequest();
+  const { socket, connected } = useSocket();
 
   useEffect(() => {
     const verifyOwner = async () => {
@@ -36,14 +37,18 @@ export default function LivePage() {
   }, [sessionCode]);
 
   useEffect(() => {
-    const socket = getSocket();
+    if (!socket) return;
 
     socket.emit(
       "get-all-quiz-user",
       {
         sessionCode,
       },
-      (response: ISocketResponse) => {
+      (
+        response: ISocketResponse<{
+          userNickname: string[];
+        }>,
+      ) => {
         if (response.success) {
           setAllUser(response.payload.userNickname || []);
         } else {
@@ -52,13 +57,22 @@ export default function LivePage() {
       },
     );
 
-    const handleUserJoined = (response: ISocketResponse) => {
+    const handleUserJoined = (
+      response: ISocketResponse<{
+        nickname: string;
+        userId: string;
+      }>,
+    ) => {
       setAllUser((prev) => [...prev, response.payload.nickname]);
     };
 
     socket.on("user-joined-notification", handleUserJoined);
 
-    const handleQuizStarted = (response: ISocketResponse) => {
+    const handleQuizStarted = (
+      response: ISocketResponse<{
+        quizId: string;
+      }>,
+    ) => {
       router.push(`/quiz/start/${response.payload.quizId}`);
     };
 
@@ -68,7 +82,7 @@ export default function LivePage() {
       socket.off("user-joined-notification", handleUserJoined);
       socket.off("quiz-started", handleQuizStarted);
     };
-  }, [sessionCode]);
+  }, [sessionCode, router, socket]);
 
   const handleStartQuiz = async () => {
     // TODO : add to params

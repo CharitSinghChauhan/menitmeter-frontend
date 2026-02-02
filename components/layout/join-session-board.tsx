@@ -4,13 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
-import getSocket, { ISocketResponse } from "@/lib/socket";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Field, FieldError } from "@/components/ui/field";
 import { Text } from "../retroui/Text";
 import { Input } from "../retroui/Input";
 import { Button } from "../retroui/Button";
+import { ISocketResponse, useSocket } from "@/providers/socket-provider";
 
 const formSchema = z.object({
   sessionCode: z
@@ -41,9 +41,10 @@ export default function JoinSessionBoard() {
   });
 
   const router = useRouter();
+  const { socket, connected } = useSocket();
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    const socket = getSocket();
+    if (!socket) return;
 
     socket.emit(
       "user-join-quiz",
@@ -51,7 +52,7 @@ export default function JoinSessionBoard() {
         sessionCode: values.sessionCode,
         nickname: values.nickname,
       },
-      (response: ISocketResponse) => {
+      (response: ISocketResponse<null>) => {
         if (response.success) {
           localStorage.setItem("session-code", values.sessionCode);
           router.push(`/quiz/live/${values.sessionCode}`);
@@ -107,11 +108,13 @@ export default function JoinSessionBoard() {
           />
 
           <div className="w-full md:w-auto">
-            <Button
-              type="submit"
-              className="w-full md:w-auto"
-            >
-              <Text as={"h6"} className="w-full flex justify-center items-center">Join</Text>
+            <Button type="submit" className="w-full md:w-auto">
+              <Text
+                as={"h6"}
+                className="w-full flex justify-center items-center"
+              >
+                Join
+              </Text>
             </Button>
           </div>
         </div>

@@ -32,7 +32,9 @@ export function CreateQuizDialog() {
   const router = useRouter();
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { payload, success } = await execute("/quiz/create-quiz", values, {
+    const { payload, success } = await execute<{
+      id: string;
+    }>("/quiz/create-quiz", values, {
       successMessage: "Quiz created successfully!",
     });
 
@@ -79,7 +81,12 @@ export function CreateQuizDialog() {
         </form>
       </div>
       <Dialog.Footer className="sm:justify-start w-full px-2 mt-4 border-0">
-        <Button type="submit" form="create-quiz-form" disabled={isPending} className="w-full flex justify-center items-center">
+        <Button
+          type="submit"
+          form="create-quiz-form"
+          disabled={isPending}
+          className="w-full flex justify-center items-center"
+        >
           {isPending ? (
             <div className="flex items-center gap-2">
               <Loader />

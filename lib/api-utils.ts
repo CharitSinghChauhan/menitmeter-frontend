@@ -9,20 +9,20 @@ interface RequestOptions {
   errorMessage?: string;
 }
 
-export const postRequest = async (
+export const postRequest = async <T>(
   url: string,
   data?: unknown,
-  options: RequestOptions = { showToast: true }
+  options: RequestOptions = { showToast: true },
 ): Promise<{
   success: boolean;
-  payload: any;
+  payload: T | null;
   message: string;
 }> => {
   try {
     console.log("data inside the postRequest", data);
 
     const response = (await api.post(url, data)).data;
-    
+
     const { payload, success, message } = response;
 
     if (!success) {
@@ -56,14 +56,14 @@ export const postRequest = async (
 export function usePostRequest() {
   const [isPending, setIsPending] = useState(false);
 
-  const execute = async (
+  const execute = async <T>(
     url: string,
     data?: unknown,
-    options: RequestOptions = { showToast: true }
+    options: RequestOptions = { showToast: true },
   ) => {
     setIsPending(true);
     try {
-      return await postRequest(url, data, options);
+      return await postRequest<T>(url, data, options);
     } finally {
       setIsPending(false);
     }

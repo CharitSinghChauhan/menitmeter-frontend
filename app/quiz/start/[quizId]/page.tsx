@@ -1,12 +1,12 @@
 "use client";
 
-import getSocket, { ISocketResponse } from "@/lib/socket";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/retroui/Button";
 import { BarChart } from "@/components/retroui/charts/BarChart";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { ISocketResponse, useSocket } from "@/providers/socket-provider";
 
 interface ICurrenQ {
   id: string | undefined;
@@ -16,8 +16,6 @@ interface ICurrenQ {
   points: number | undefined;
 }
 
-type RankingItem = [string, number];
-
 const StartQuizPage = () => {
   const [currentQ, setCurrentQ] = useState<ICurrenQ | null>({
     id: "1",
@@ -26,17 +24,26 @@ const StartQuizPage = () => {
     timeLimit: 10,
     points: 100,
   });
-  const [ranking, setRanking] = useState<RankingItem[] | null>(null);
+  const [ranking, setRanking] = useState<string[] | null>(null);
   // TODO : revamp the logic correct ans
   const [isCurrentAns, setIsCurrentAns] = useState<boolean | null>(null);
   const [correctOption, setCorrectOption] = useState<number | null>(null);
   const [selectedOption, setSelectOption] = useState<number | null>(null);
   const router = useRouter();
+  const { socket, connected } = useSocket();
 
   useEffect(() => {
-    const socket = getSocket();
+    if (!socket) return;
 
-    const handleQuestion = (response: ISocketResponse) => {
+    const handleQuestion = (
+      response: ISocketResponse<{
+        id: string | undefined;
+        text: string | undefined;
+        options: string[] | undefined;
+        timeLimit: number | undefined;
+        points: number | undefined;
+      }>,
+    ) => {
       setRanking(null);
       setIsCurrentAns(null);
       setCorrectOption(null);
@@ -49,16 +56,20 @@ const StartQuizPage = () => {
       }
     };
 
-    const handleRanking = (response: ISocketResponse) => {
+    const handleRanking = (
+      response: ISocketResponse<{
+        top10UsersWithScore: string[];
+      }>,
+    ) => {
       setCurrentQ(null);
       console.log("ranking", response);
       if (response.success) {
         console.log("ranking", response.payload);
-        setRanking((response.payload as { top10UsersWithScore: RankingItem[] }).top10UsersWithScore);
+        setRanking(response.payload.top10UsersWithScore);
       }
     };
 
-    const handleQuizEnd = (socket: ISocketResponse) => {
+    const handleQuizEnd = (socket: ISocketResponse<null>) => {
       router.replace("/");
     };
 
@@ -79,7 +90,7 @@ const StartQuizPage = () => {
   }, []);
 
   const handleAnsSubmit = (index: number) => {
-    const socket = getSocket();
+    if (!socket) return;
 
     const sessionCode = localStorage.getItem("session-code");
 
@@ -90,7 +101,11 @@ const StartQuizPage = () => {
         ansIndex: index,
         qId: currentQ?.id,
       },
-      (response: ISocketResponse) => {
+      (
+        response: ISocketResponse<{
+          correctOptionIndex: number;
+        }>,
+      ) => {
         console.log("answer submit", response);
         if (response.success) {
           // Update state based on response
