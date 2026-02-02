@@ -1,19 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area"
+import * as React from "react";
+import { ScrollArea as ScrollAreaPrimitive } from "@base-ui/react/scroll-area";
 
-import { cn } from "@/lib/utils"
+import { cn } from "@/lib/utils";
 
 function ScrollArea({
   className,
   children,
   ...props
 }: ScrollAreaPrimitive.Root.Props) {
+  const combinedClassName =
+    typeof className === "function"
+      ? (state: ScrollAreaPrimitive.Root.State) =>
+          cn("relative", className(state))
+      : cn("relative", className);
+
   return (
     <ScrollAreaPrimitive.Root
       data-slot="scroll-area"
-      className={cn("relative", className)}
+      className={combinedClassName}
       {...props}
     >
       <ScrollAreaPrimitive.Viewport
@@ -25,7 +31,7 @@ function ScrollArea({
       <ScrollBar />
       <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
-  )
+  );
 }
 
 function ScrollBar({
@@ -33,15 +39,24 @@ function ScrollBar({
   orientation = "vertical",
   ...props
 }: ScrollAreaPrimitive.Scrollbar.Props) {
+  const combinedClassName =
+    typeof className === "function"
+      ? (state: ScrollAreaPrimitive.Scrollbar.State) =>
+          cn(
+            "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none",
+            className(state),
+          )
+      : cn(
+          "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none",
+          className,
+        );
+
   return (
     <ScrollAreaPrimitive.Scrollbar
       data-slot="scroll-area-scrollbar"
       data-orientation={orientation}
       orientation={orientation}
-      className={cn(
-        "data-horizontal:h-2.5 data-horizontal:flex-col data-horizontal:border-t data-horizontal:border-t-transparent data-vertical:h-full data-vertical:w-2.5 data-vertical:border-l data-vertical:border-l-transparent flex touch-none p-px transition-colors select-none",
-        className
-      )}
+      className={combinedClassName}
       {...props}
     >
       <ScrollAreaPrimitive.Thumb
@@ -49,7 +64,7 @@ function ScrollBar({
         className="rounded-full bg-border relative flex-1"
       />
     </ScrollAreaPrimitive.Scrollbar>
-  )
+  );
 }
 
-export { ScrollArea, ScrollBar }
+export { ScrollArea, ScrollBar };
