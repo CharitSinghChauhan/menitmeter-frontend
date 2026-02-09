@@ -15,6 +15,12 @@ export default function SignIn() {
 
   const callBackUrl = process.env.NEXT_PUBLIC_FRONTEND_URL + "/dashboard";
 
+  console.log("Debug info:", {
+    backendURL: process.env.NEXT_PUBLIC_BACKEND_URL,
+    frontendURL: process.env.NEXT_PUBLIC_FRONTEND_URL,
+    callbackURL: callBackUrl,
+  });
+
   return (
     <Card>
       <Dialog.Header className="flex justify-center items-center py-4 bg-accent text-accent-foreground border-0 ">
@@ -33,12 +39,13 @@ export default function SignIn() {
                 provider: "google",
                 callbackURL: callBackUrl,
               },
-              // TODO : Learn
               {
                 onRequest: (ctx) => {
+                  console.log("Request context:", ctx);
                   setLoading(true);
                 },
                 onResponse: (ctx) => {
+                  console.log("Response context:", ctx);
                   setLoading(false);
                 },
               },
