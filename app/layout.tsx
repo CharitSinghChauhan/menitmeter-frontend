@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo_Black, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/retroui/Sonner";
+import { AuthProvider } from "@/components/providers/auth-provider";
 
 const archivoBlack = Archivo_Black({
   subsets: ["latin"],
@@ -30,8 +31,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${space.variable} ${archivoBlack.variable} `}>
-        <Toaster position="top-left" />
-        {children}
+        <AuthProvider>
+          <Toaster position="top-left" />
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

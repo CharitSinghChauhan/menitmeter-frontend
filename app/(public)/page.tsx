@@ -6,13 +6,15 @@ import { Text } from "@/components/retroui/Text";
 import JoinSessionBoard from "@/components/layout/join-session-board";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
-import { authClient } from "@/lib/auth";
+
 import SignIn from "@/components/sign-in";
 import { Loader } from "@/components/retroui/Loader";
 import { Dialog } from "@/components/retroui/Dialog";
+import FAQAccordion from "@/components/faq-accordion";
+import { useSession } from "@/lib/use-session";
 
 export default function PublicPage() {
-  const { data, isPending } = authClient.useSession();
+  const { data, isPending } = useSession();
   const router = useRouter();
 
   return (
@@ -79,7 +81,9 @@ export default function PublicPage() {
             <span className="text-primary italic">Play, Compete, Win.</span>
           </h1>
           <p className="text-xl md:text-2xl max-w-2xl mb-12 text-black font-medium">
-            Enter a session code to jump into real-time quizzes. Answer questions instantly, track your score, and see live rankings against other players.
+            Enter a session code to jump into real-time quizzes. Answer
+            questions instantly, track your score, and see live rankings against
+            other players.
           </p>
           <div className="mt-8 flex flex-wrap justify-center gap-8 text-black font-mono text-sm uppercase">
             <div className="flex items-center gap-2 font-bold">
@@ -171,7 +175,8 @@ export default function PublicPage() {
             </span>
           </h2>
           <p className="text-xl text-black max-w-2xl font-medium">
-            Join live quiz sessions, answer questions in real-time, and watch your ranking update instantly as you compete with players worldwide.
+            Join live quiz sessions, answer questions in real-time, and watch
+            your ranking update instantly as you compete with players worldwide.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -183,7 +188,8 @@ export default function PublicPage() {
               Quick Join
             </h3>
             <p className="text-black font-medium leading-relaxed">
-              Enter a 6-digit code and jump straight into an active quiz. No sign-up required for participants.
+              Enter a 6-digit code and jump straight into an active quiz. No
+              sign-up required for participants.
             </p>
           </div>
           <div className="border-4 border-black p-8 bg-white brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none group">
@@ -194,7 +200,8 @@ export default function PublicPage() {
               Live Rankings
             </h3>
             <p className="text-black font-medium leading-relaxed">
-              See your position update in real-time. Compete for the top spot and track your progress against others.
+              See your position update in real-time. Compete for the top spot
+              and track your progress against others.
             </p>
           </div>
           <div className="border-4 border-black p-8 bg-white brutalist-shadow transition-all hover:translate-x-1 hover:translate-y-1 hover:shadow-none group">
@@ -205,7 +212,8 @@ export default function PublicPage() {
               Instant Results
             </h3>
             <p className="text-black font-medium leading-relaxed">
-              Get immediate feedback on answers. View detailed results and leaderboards at the end of each quiz.
+              Get immediate feedback on answers. View detailed results and
+              leaderboards at the end of each quiz.
             </p>
           </div>
         </div>
@@ -219,13 +227,55 @@ export default function PublicPage() {
               <span className="text-primary">your wits?</span>
             </h2>
             <div className="flex flex-wrap gap-4">
-              <Button onClick={() => router.push("/dashboard")}>Create Quiz</Button>
+              <Button onClick={() => router.push("/dashboard")}>
+                Create Quiz
+              </Button>
               <Button>Browse Sessions</Button>
             </div>
           </div>
           <div className="absolute right-[-5%] top-[-10%] opacity-10 pointer-events-none rotate-12">
             <span className=" text-[300px] text-black select-none">quiz</span>
           </div>
+        </div>
+      </section>
+
+      <section className="py-20 px-6 bg-gray-100">
+        <div className="max-w-3xl mx-auto">
+          <h2 className="text-4xl font-black text-center mb-4 uppercase italic tracking-tighter">
+            Frequently Asked Questions
+          </h2>
+          <p className="text-center text-black font-medium mb-12">
+            Everything you need to know about QuizArena
+          </p>
+          <FAQAccordion
+            items={[
+              {
+                question: "How do I join a quiz session?",
+                answer:
+                  "Simply enter the session code provided by the quiz host in the join session box on the home page, or use the direct link shared by the presenter.",
+              },
+              {
+                question: "Can I create my own quizzes?",
+                answer:
+                  "Yes! Sign in to your account and navigate to the dashboard to create custom quizzes with multiple question types, images, and more.",
+              },
+              {
+                question: "Is QuizArena free to use?",
+                answer:
+                  "QuizArena offers both free and premium plans. The free plan includes basic quiz creation and hosting, while premium unlocks advanced features.",
+              },
+              {
+                question: "How does real-time scoring work?",
+                answer:
+                  "Scores update instantly as participants answer questions. Leaderboards refresh in real-time showing everyone's current rankings.",
+              },
+              {
+                question: "Can I use QuizArena for educational purposes?",
+                answer:
+                  "Absolutely! QuizArena is perfect for classrooms, training sessions, and educational workshops. You can create quiz sets tailored to your curriculum.",
+              },
+            ]}
+          />
         </div>
       </section>
 
@@ -241,7 +291,8 @@ export default function PublicPage() {
               </h2>
             </div>
             <p className="text-black font-medium mb-8">
-              Join live quiz battles, answer in real-time, and climb the global leaderboards in this fast-paced knowledge arena.
+              Join live quiz battles, answer in real-time, and climb the global
+              leaderboards in this fast-paced knowledge arena.
             </p>
             <div className="flex gap-4">
               <a

@@ -53,7 +53,7 @@ export function PresentationCard({
           localStorage.setItem("session-code", payload.sessionCode);
           router.push(`/quiz/live/${payload.sessionCode}`);
         } else {
-          console.log("handle navigate quiz", success, payload);
+
           // If creation failed or no code, maybe fallback to edit?
           // For now, let's just stay or error.
         }

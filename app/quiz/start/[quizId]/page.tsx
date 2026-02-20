@@ -48,7 +48,6 @@ const StartQuizPage = () => {
       setIsCurrentAns(null);
       setCorrectOption(null);
       setSelectOption(null);
-      console.log("question", response);
       if (response.success) {
         setCurrentQ(response.payload as ICurrenQ);
       } else {
@@ -62,9 +61,7 @@ const StartQuizPage = () => {
       }>,
     ) => {
       setCurrentQ(null);
-      console.log("ranking", response);
       if (response.success) {
-        console.log("ranking", response.payload);
         setRanking(response.payload.top10UsersWithScore);
       }
     };
@@ -106,12 +103,10 @@ const StartQuizPage = () => {
           correctOptionIndex: number;
         }>,
       ) => {
-        console.log("answer submit", response);
         if (response.success) {
           // Update state based on response
           const payload = response.payload as { correctOptionIndex: number };
           if (payload.correctOptionIndex === index) {
-            console.log("inside the correctAns");
             setIsCurrentAns(true);
           } else {
             setIsCurrentAns(false);
@@ -188,7 +183,6 @@ const StartQuizPage = () => {
                     if (isResultPhase) return;
                     handleAnsSubmit(idx);
                     setSelectOption(idx);
-                    console.log("Selected:", option);
                   }}
                   disabled={isResultPhase}
                 >

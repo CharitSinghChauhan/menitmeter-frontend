@@ -8,8 +8,8 @@ import {
   LogoutIcon,
   User,
 } from "@hugeicons/core-free-icons";
-import { authClient, signOut } from "@/lib/auth";
-import { useRouter } from "next/navigation";
+import { signOut } from "@/lib/auth";
+import { useSession } from "@/lib/use-session";
 import { Loader } from "@/components/retroui/Loader";
 import { Avatar } from "@/components/retroui/Avatar";
 import { Input } from "@/components/retroui/Input";
@@ -22,13 +22,10 @@ import {
 import { SidebarTrigger } from "@/components/ui/sidebar";
 
 export function DashboardNavbar() {
-  const { data, isPending } = authClient.useSession();
-
-  const router = useRouter();
+  const { data, isPending } = useSession();
 
   const handleSignOut = async () => {
-    await signOut();
-    router.push("/");
+    await signOut(); // signOut redirects to "/" itself
   };
 
   return (

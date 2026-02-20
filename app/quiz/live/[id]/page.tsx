@@ -29,7 +29,7 @@ export default function LivePage() {
           setOwner(true);
         }
       } catch (error) {
-        console.error(error);
+        // error handling
       }
     };
 
@@ -52,7 +52,7 @@ export default function LivePage() {
         if (response.success) {
           setAllUser(response.payload.userNickname || []);
         } else {
-          console.log("error", response);
+          // handle error
         }
       },
     );
@@ -85,9 +85,7 @@ export default function LivePage() {
   }, [sessionCode, router, socket]);
 
   const handleStartQuiz = async () => {
-    // TODO : add to params
     const quizId = localStorage.getItem("quiz-id");
-    console.log("handleStartquiz quizId:", quizId);
 
     await execute(`/quiz/start-quiz/${quizId}`);
   };

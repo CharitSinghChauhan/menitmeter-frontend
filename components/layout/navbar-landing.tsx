@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import SignIn from "../sign-in";
-import { authClient } from "@/lib/auth";
+import { useSession } from "@/lib/use-session";
 import { useRouter } from "next/navigation";
 import { Loader } from "../retroui/Loader";
 import { Button } from "../retroui/Button";
@@ -10,7 +10,7 @@ import { Dialog } from "../retroui/Dialog";
 import { Text } from "../retroui/Text";
 
 export default function Navbar() {
-  const { data, isPending } = authClient.useSession();
+  const { data, isPending } = useSession();
 
   const router = useRouter();
 

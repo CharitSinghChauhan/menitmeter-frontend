@@ -36,11 +36,9 @@ export const SocketProvider = ({ children }: { children: React.ReactNode }) => {
       setSocket(s);
 
       s.on("connect", () => {
-        console.log("inside connect: true");
         setConnected(true);
       });
       s.on("disconnect", () => {
-        console.log("inside disconnect");
         setConnected(false);
       });
 

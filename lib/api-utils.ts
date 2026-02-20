@@ -19,8 +19,6 @@ export const postRequest = async <T>(
   message: string;
 }> => {
   try {
-    console.log("data inside the postRequest", data);
-
     const response = (await api.post(url, data)).data;
 
     const { payload, success, message } = response;
@@ -47,7 +45,6 @@ export const postRequest = async <T>(
       toast.error(options.errorMessage || message);
     }
 
-    console.error(`POST request failed [${url}]:`, error);
     return { payload: null, success: false, message };
   }
 };
